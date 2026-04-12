@@ -1,0 +1,44 @@
+services:
+  hermes:
+    build:
+      context: ./hermes-agent
+    platform: linux/amd64
+    environment:
+      API_SERVER_ENABLED: "true"
+      API_SERVER_HOST: "::"
+      API_SERVER_PORT: "8642"
+      API_SERVER_KEY: "${HERMES_API_KEY}"
+      TERMINAL_BACKEND: "local"
+      OPENROUTER_API_KEY: "${OPENROUTER_API_KEY}"
+      OPENROUTER_MODEL: "${OPENROUTER_MODEL:-qwen/qwen3.6-plus}"
+      MEMORY_PROVIDER: "${MEMORY_PROVIDER:-supermemory}"
+      SUPERMEMORY_API_KEY: "${SUPERMEMORY_API_KEY:-}"
+      HERMES_MODEL_EXTRA_YAML: "${HERMES_MODEL_EXTRA_YAML:-}"
+      OPENROUTER_PROVIDER_ROUTING_YAML: "${OPENROUTER_PROVIDER_ROUTING_YAML:-}"
+      HERMES_CONFIG_EXTRA_YAML: "${HERMES_CONFIG_EXTRA_YAML:-}"
+      COMPOSIO_MCP_URL: "${COMPOSIO_MCP_URL:-}"
+      COMPOSIO_API_KEY: "${COMPOSIO_API_KEY:-}"
+      COMPOSIO_ORG: "${COMPOSIO_ORG:-}"
+      COMPOSIO_CONSUMER_API_KEY: "${COMPOSIO_CONSUMER_API_KEY:-}"
+      COMPOSIO_AUTH_HEADER_NAME: "${COMPOSIO_AUTH_HEADER_NAME:-x-api-key}"
+    ports:
+      - "8642:8642"
+    volumes:
+      - hermes-data:/root/.hermes
+
+  open-webui:
+    build:
+      context: ./open-webui
+    depends_on:
+      - hermes
+    environment:
+      OPENAI_API_BASE_URL: "http://hermes:8642/v1"
+      OPENAI_API_KEY: "${HERMES_API_KEY}"
+    ports:
+      - "3000:8080"
+    volumes:
+      - open-webui-data:/app/backend/data
+
+volumes:
+  hermes-data:
+  open-webui-data:
