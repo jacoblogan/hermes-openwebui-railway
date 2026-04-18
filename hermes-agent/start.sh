@@ -13,6 +13,11 @@ set -eu
 : "${HERMES_MODEL_EXTRA_YAML:=}"
 : "${OPENROUTER_PROVIDER_ROUTING_YAML:=}"
 : "${HERMES_CONFIG_EXTRA_YAML:=}"
+: "${HERMES_INSTALL:=/opt/hermes}"
+
+# Official image installs the CLI in the uv venv only; the upstream entrypoint
+# activates it. This template replaces that entrypoint, so call the binary explicitly.
+HERMES_CLI="${HERMES_INSTALL}/.venv/bin/hermes"
 
 CONFIG_PATH="${HERMES_HOME}/config.yaml"
 TEMPLATE_MARKER="# Managed by hermes-openwebui-railway template"
@@ -154,4 +159,10 @@ fi
 
 login_composio_cli
 
-exec hermes gateway
+if [ ! -x "${HERMES_CLI}" ]; then
+  echo "Hermes CLI not found or not executable at ${HERMES_CLI}" >&2
+  echo "Set HERMES_INSTALL if your image uses a different install path." >&2
+  exit 1
+fi
+
+exec "${HERMES_CLI}" gateway
