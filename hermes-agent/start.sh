@@ -99,23 +99,23 @@ write_config() {
 ${TEMPLATE_MARKER}
 model:
   provider: openrouter
-  default: ${OPENROUTER_MODEL}
+  default: "${OPENROUTER_MODEL}"
 EOF
 
   append_indented_yaml "${HERMES_MODEL_EXTRA_YAML}"
 
   cat <<EOF
 memory:
-  provider: ${MEMORY_PROVIDER}
+  provider: "${MEMORY_PROVIDER}"
 EOF
 
   cat <<EOF
 platforms:
   api_server:
     enabled: ${API_SERVER_ENABLED}
-    host: ${API_SERVER_HOST}
+    host: "${API_SERVER_HOST}"
     port: ${API_SERVER_PORT}
-    key: ${API_SERVER_KEY}
+    key: "${API_SERVER_KEY}"
 EOF
 
   if [ "${MEMORY_PROVIDER}" = "holographic" ]; then
