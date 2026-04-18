@@ -109,6 +109,15 @@ memory:
   provider: ${MEMORY_PROVIDER}
 EOF
 
+  cat <<EOF
+platforms:
+  api_server:
+    enabled: ${API_SERVER_ENABLED}
+    host: ${API_SERVER_HOST}
+    port: ${API_SERVER_PORT}
+    key: ${API_SERVER_KEY}
+EOF
+
   if [ "${MEMORY_PROVIDER}" = "holographic" ]; then
     cat <<EOF
 plugins:
