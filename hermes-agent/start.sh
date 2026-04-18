@@ -152,7 +152,20 @@ EOF
   append_raw_yaml "${HERMES_CONFIG_EXTRA_YAML}"
 }
 
-if [ ! -f "${CONFIG_PATH}" ] || grep -qF "${TEMPLATE_MARKER}" "${CONFIG_PATH}"; then
+needs_config_write=false
+
+if [ ! -f "${CONFIG_PATH}" ]; then
+  needs_config_write=true
+elif grep -qF "${TEMPLATE_MARKER}" "${CONFIG_PATH}"; then
+  needs_config_write=true
+elif ! grep -qE '^[[:space:]]*api_server:[[:space:]]*$' "${CONFIG_PATH}"; then
+  # The Railway template relies on the API server for /health and Open WebUI.
+  # If a user-edited config removed platforms.api_server, the gateway will start
+  # but the service will never become healthy. Regenerate the template config.
+  needs_config_write=true
+fi
+
+if [ "${needs_config_write}" = "true" ]; then
   if [ -z "${OPENROUTER_API_KEY:-}" ]; then
     echo "OPENROUTER_API_KEY must be set for the template-managed OpenRouter model" >&2
     exit 1
